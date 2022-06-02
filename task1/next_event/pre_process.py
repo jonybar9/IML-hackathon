@@ -51,10 +51,20 @@ def split_train_data_to_X_and_y(lst):
     """
     y = [df[4:] for df in lst]
     y = pd.concat(y)
+    d = y.shape[1]
+    categorial_indices = []
+    for label in ['linqmap_type','linqmap_subtype','day_of_week']:
+        categorial_indices.append(list(y.columns).index(label))
+        categorial_indices.append(categorial_indices[-1]+d)
+        categorial_indices.append(categorial_indices[-1]+d)
+        categorial_indices.append(categorial_indices[-1]+d)
+
     y = y[['linqmap_type', 'linqmap_subtype', 'x', 'y']]  # keep only labels we need to predict
 
     X = np.array([df[:4].to_numpy().flatten() for df in lst])
-    return X, y
+
+
+    return X, y, sorted(categorial_indices)
 
 
 def merge_test_data(lst):
