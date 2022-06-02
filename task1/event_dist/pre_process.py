@@ -1,3 +1,4 @@
+import pandas as pd
 def preprocess(data, question):
     return clean_data(data, question)
 
