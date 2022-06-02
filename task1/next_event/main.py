@@ -20,7 +20,7 @@ def main():
     grouped_dev = group_by_bulk(dev_with_groups)
     X_dev, y_dev = split_train_data_to_X_and_y(grouped_dev)
 
-    type_classefier_model(train_data, dev, X_train, y_train)
+    type_classefier_model(train_data, X_dev,y_dev, X_train, y_train)
 
 
 def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
@@ -49,7 +49,7 @@ def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_
         return sub_type_prediction
 
     prediction = catboost_classifier()
-    return prediction , match_common_subtype(prediction)
+    return prediction, match_common_subtype(prediction)
 
 
 def fit(data):
