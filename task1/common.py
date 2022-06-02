@@ -5,9 +5,6 @@ def parse_time(data):
     data['pubDate'] = pd.to_datetime(data['pubDate'])
     # create dummy variables for day of week
     data['day_of_week'] = data['pubDate'].dt.day_name()
-    data = pd.concat([data, pd.get_dummies(data['day_of_week'], drop_first=True)], axis=1)
-    data.drop(columns=['day_of_week'], inplace=True)
-
     data['hour'] = data['pubDate'].dt.hour
 
 
