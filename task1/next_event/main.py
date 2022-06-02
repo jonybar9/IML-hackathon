@@ -1,9 +1,12 @@
 import pandas as pd
 import numpy as np
 from task1.next_event.utils import load_data, data_split
+from task1.next_event.pre_process import preprocess, bulk_bootsraping, \
+    group_by_bulk, split_train_data_to_X_and_y, merge_test_data
 from task1.next_event.pre_process import preprocess
 from pre_process import bulk_bootsraping, group_by_bulk, split_train_data_to_X_and_y, merge_test_data
 from catboost import CatBoostClassifier, CatBoostRegressor, Pool
+from catboost import CatBoostClassifier, CatBoostRegressor
 
 
 def main():
