@@ -1,6 +1,9 @@
 import pandas as pd
+
+
 def preprocess(data, question):
     return clean_data(data, question)
+
 
 def clean_data(data, question):
     """
@@ -27,18 +30,20 @@ def clean_data(data, question):
         data = data.drop(columns=columns_to_drop_Q2)
 
     # remove columns we don't want
-    columns_to_drop_Q1 = ['OBJECTID', 'pubDate', 'linqmap_reportDescription',
+    columns_to_drop = ['OBJECTID', 'pubDate', 'linqmap_reportDescription',
                           'linqmap_reportDescription', 'linqmap_street', 'linqmap_nearby',
                           'linqmap_reportMood', 'linqmap_roadType', 'linqmap_reportMood',
                           'linqmap_reportRating', 'linqmap_expectedBeginDate', 'linqmap_expectedEndDate',
                           'linqmap_reliability', 'nComments', 'update_date', 'linqmap_city']
-    data = data.drop(columns=columns_to_drop_Q1)
+    data = data.drop(columns=columns_to_drop)
+    data.dropna(inplace=True)
 
     return data
+
 
 def structure_data():
     pass
 
+
 def add_features():
     pass
-
