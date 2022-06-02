@@ -48,7 +48,6 @@ def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_
     :return: Tuple[event family prediction, event subtype prediction]
     """
     train_labels = fifth.linqmap_type
-
     def catboost_classifier():
         baseline_family_tree = CatBoostClassifier(iterations=100)
         baseline_family_tree.fit(flatten, train_labels, cat_features=categorial_indices)
@@ -61,6 +60,21 @@ def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_
         func = (lambda item: most_common_sub_types[item]['linqmap_subtype'])
         sub_type_prediction = np.array(list(map(func, pred)))
         return sub_type_prediction
+
+    def subtype_classifiers(predicted_types):
+        # fit:
+        families = {}
+        for family in np.unique(train_labels):
+            family_data = train[train.linqmap_type == family]
+            family_labels = family_data.drop('linqmap_subtype')
+            model = CatBoostClassifier(iterations=100)
+            model.fit(flatten, train_labels, cat_features=['linqmap_type', 'day_of_week'])
+            families[family] = model
+
+        # prediction - this will not work
+        func = (lambda item: families[item].predict(dev))
+        sub_type_prediction = np.array(list(map(func, predicted_types)))
+
 
     prediction = catboost_classifier()
     return prediction , match_common_subtype(prediction)
