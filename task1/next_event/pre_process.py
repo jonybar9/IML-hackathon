@@ -17,7 +17,7 @@ def preprocess(data):
     return data
 
 
-def split_data_to_X_and_y(lst):
+def split_train_data_to_X_and_y(lst):
     """
     lst: list of dataframes with five rows
     returns: X: numpy matrix where each row is four samples flattened
@@ -29,7 +29,14 @@ def split_data_to_X_and_y(lst):
     y = y[['linqmap_type', 'linqmap_subtype', 'x', 'y']]  # keep only labels we need to predict
     return X, y
 
-
+def merge_test_data(lst):
+    """
+    lst: list of dataframes with five rows
+    returns: X: numpy matrix where each row is four samples flattened
+             y: pandas DataFrame where each row is the labels we need to predict of corresponding row in X
+    """
+    X = np.array([df[:4].to_numpy().flatten() for df in lst])
+    return X
 
 
 # def group_by_time(data):
