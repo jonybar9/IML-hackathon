@@ -5,6 +5,7 @@ def preprocess(data):
     columns_to_drop_Q2 = ['linqmap_subtype', 'linqmap_magvar', 'x', 'y']
     data = data.drop(columns=columns_to_drop_Q2)
     data = data.drop(columns=UNUSED_COLUMNS)
+    data.dropna(inplace=True)
     return data
 
 

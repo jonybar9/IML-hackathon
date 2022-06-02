@@ -5,7 +5,7 @@ def preprocess(data):
     data = data[data['linqmap_city'] == 'תל אביב - יפו']
     
     data = data.drop(columns=UNUSED_COLUMNS)
-
+    data.dropna(inplace=True)
     return data
 
 # def group_by_time(data):
