@@ -1,10 +1,12 @@
 from ..common import UNUSED_COLUMNS, parse_time
 import pandas as pd
+import numpy as np
+
 
 def preprocess(data):
     parse_time(data)
     data = data[data['linqmap_city'] == 'תל אביב - יפו']
-    
+
     data = data.drop(columns=UNUSED_COLUMNS)
     data.dropna(inplace=True)
 
@@ -14,15 +16,30 @@ def preprocess(data):
 
     return data
 
+
+def split_data_to_X_and_y(lst):
+    """
+    lst: list of dataframes with five rows
+    returns: X: numpy matrix where each row is four samples flattened
+             y: pandas DataFrame where each row is the labels we need to predict of corresponding row in X
+    """
+    X = np.array([df[:4].to_numpy().flatten() for df in lst])
+    y = [df[4:] for df in lst]
+    y = pd.concat(y)
+    y = y[['linqmap_type', 'linqmap_subtype', 'x', 'y']]  # keep only labels we need to predict
+    return X, y
+
+
+
+
 # def group_by_time(data):
 
 
 # def clean_data():
-    
 
 
 # def structure_data():
-    # pass
+# pass
 
 # def add_features():
-    # pass
+# pass
