@@ -21,6 +21,7 @@ def main():
     most_common_sub_types = train_data.groupby(['linqmap_type'])['linqmap_subtype'].agg(pd.Series.mode).to_frame()
     #sub_type_prediction: for each value in family_prediction match the most common val from groupby
 
+
 def split_data(data: pd.Dataframe):
     """
     splits the data for the event types classifiers
