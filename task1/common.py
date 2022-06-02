@@ -1,10 +1,12 @@
 import pandas as pd
+import pickle
 
 def parse_time(data):
     # convert date to datetime format and add time features
-    data['update_date'] = pd.to_datetime(data['update_date'], unit='ms')
-    data['day_of_week'] = data['update_date'].dt.day_name()
-    data['hour'] = data['update_date'].dt.hour
+    data['pubDate'] = pd.to_datetime(data['pubDate'])
+    # create dummy variables for day of week
+    data['day_of_week'] = data['pubDate'].dt.day_name()
+    data['hour'] = data['pubDate'].dt.hour
 
 
 UNUSED_COLUMNS = ['OBJECTID', 'pubDate', 'linqmap_reportDescription',
@@ -16,3 +18,10 @@ UNUSED_COLUMNS = ['OBJECTID', 'pubDate', 'linqmap_reportDescription',
 
 def load_data():
     return pd.read_csv("../datasets/waze_data.csv")
+
+def save_model(filename, model):
+    pickle.dump(model, open(filename, 'wb'))
+
+def load_model(filename):
+    loaded_model = pickle.load(open(filename, 'rb'))
+    return loaded_model
