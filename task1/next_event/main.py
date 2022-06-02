@@ -21,11 +21,11 @@ def type_classefier_model(train: pd.DataFrame, dev: pd.DataFrame, flatten: pd.Da
         family_prediction = baseline_family_tree.predict(dev)
         return family_prediction
 
-    def match_common_subtype(prediction):
+    def match_common_subtype(pred):
         most_common_sub_types = train.groupby(['linqmap_type'])['linqmap_subtype'].agg(pd.Series.mode).to_frame()
         most_common_sub_types = most_common_sub_types.to_dict(orient='index')
         func = (lambda item: most_common_sub_types[item]['linqmap_subtype'])
-        sub_type_prediction = np.array(list(map(func, prediction)))
+        sub_type_prediction = np.array(list(map(func, pred)))
         return sub_type_prediction
 
     prediction = catboost_classifier()
