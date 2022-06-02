@@ -22,14 +22,16 @@ def main():
 
     type_classefier_model(train_data, dev, X_train, y_train)
 
+
 def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
     """
-
+    This function fits over flattened groups data to predict the event family and sub-type of the fifth event
     :param train: training data - preprocessed but not flattened/aggregated by group
-    :param dev: dev data - preprocessed but not flattened/aggregated by group
+    :param flatten_dev: dev data preprocessed and flattened by group
+    :param fifth_dev: dev labels preprocessed and by group
     :param flatten: training data preprocessed and flattened by group
-    :param fifth: training lables of
-    :return:
+    :param fifth: training labels preprocessed and by group
+    :return: Tuple[event family prediction, event subtype prediction]
     """
     train_labels = fifth.linqmap_type
 
