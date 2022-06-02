@@ -23,7 +23,7 @@ def main():
     grouped_dev = group_by_bulk(dev_with_groups)
     X_dev, y_dev, categorial_indices  = split_train_data_to_X_and_y(grouped_dev)
 
-    # type_classefier_model(train_data, dev, X_train, y_train)
+    type_classefier_model(train_data, X_dev,y_dev, X_train, y_train)
     predictions = regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices)
 
 def regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices):
@@ -35,8 +35,6 @@ def regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices):
     model_y.fit(X_train, y_train[3], cat_features=categorial_indices)
 
     return model_x.predict(X_dev), model_y.predict(X_dev)
-
-
 
 
 def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
