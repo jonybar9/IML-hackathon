@@ -65,14 +65,3 @@ def merge_test_data(lst):
     """
     X = np.array([df[:4].to_numpy().flatten() for df in lst])
     return X
-
-# def group_by_time(data):
-# def clean_data():
-    
-
-
-# def structure_data():
-    # pass
-
-# def add_features():
-    # pass
