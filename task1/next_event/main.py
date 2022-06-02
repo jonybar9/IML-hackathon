@@ -1,6 +1,7 @@
 import pandas as pd
-from .utils import load_data, data_split
-from .pre_process import preprocess
+import numpy as np
+from task1.next_event.utils import load_data, data_split
+from task1.next_event.pre_process import preprocess
 from sklearn.tree import DecisionTreeClassifier
 
 
@@ -10,6 +11,7 @@ def main():
     data = preprocess(data)
     train_data, dev, test = data_split(data)
 
+def type_classefier_model(data: pd.DataFrame):
     event_family, event_subtype = split_data_for_event_classifiers(train_data)
 
     # PART ONE: Classification of Event Type: Using decision tree
@@ -20,10 +22,11 @@ def main():
     # PART TWO: Classification of Event Sub Type: Using Mean
     # for all events from this family, return the most common subtype
     most_common_sub_types = train_data.groupby(['linqmap_type'])['linqmap_subtype'].agg(pd.Series.mode).to_frame()
-    #sub_type_prediction: for each value in family_prediction match the most common val from groupby
+    # sub_type_prediction: for each value in family_prediction match the most common val from groupby
 
 
-def split_data_for_event_classifiers(data: pd.Dataframe):
+
+def split_data_for_event_classifiers(data: pd.DataFrame):
     """
     splits the data for the event types classifiers
     :param data: pandas.DataFrame
@@ -48,4 +51,5 @@ def predict(data):
 
 
 if __name__ == "__main__":
+    np.random.seed(0)
     main()
