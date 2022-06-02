@@ -7,6 +7,6 @@ cd IML-hackathon
 
 pip install virtualenv
 virtualenv --python python3 venv
-.\venv\Scripts\activate
+task1\venv\Scripts\activate
 pip install -r requirements.txt
 ```
