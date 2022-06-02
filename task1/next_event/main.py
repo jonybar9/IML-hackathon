@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from task1.next_event.utils import load_data, data_split
 from task1.next_event.pre_process import preprocess
+from sklearn.tree import DecisionTreeClassifier
+from pre_process import bulk_bootsraping, group_by_bulk, split_train_data_to_X_and_y, merge_test_data
 from catboost import CatBoostClassifier
 
 
@@ -10,6 +12,17 @@ def main():
     data = load_data(r"..\datasets\waze_data.csv")
     data = preprocess(data)
     train_data, dev, test = data_split(data)
+
+    train_with_groups = bulk_bootsraping(train_data)
+    grouped_train = group_by_bulk(train_with_groups)
+    X_train, y_train = split_train_data_to_X_and_y(grouped_train)
+
+    dev_with_groups = bulk_bootsraping(dev)
+    grouped_dev = group_by_bulk(dev_with_groups)
+    X_dev, y_dev = split_train_data_to_X_and_y(grouped_dev)
+
+
+
     type_classefier_model(train_data, dev, test, train_data, train_data)
 
 def type_classefier_model(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
