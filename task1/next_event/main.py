@@ -21,7 +21,7 @@ def main():
 
     dev_with_groups = bulk_bootsraping(dev)
     grouped_dev = group_by_bulk(dev_with_groups)
-    X_dev, y_dev, categorial_indices = split_train_data_to_X_and_y(grouped_dev)
+    X_dev, y_dev, categorial_indices  = split_train_data_to_X_and_y(grouped_dev)
 
     # type_classefier_model(train_data, dev, X_train, y_train)
     predictions = regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices)

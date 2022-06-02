@@ -10,7 +10,7 @@ def preprocess(data):
     parse_time(data)
     data = data[data['linqmap_city'] == 'תל אביב - יפו']
     data = data.drop(columns=UNUSED_COLUMNS) # THIS NEEDS TO CHANGE
-    data.dropna(inplace=True)
+    data.dropna(inplace=True )
 
 
     return data
