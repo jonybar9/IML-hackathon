@@ -12,13 +12,21 @@ def main():
     train_data, dev, test = data_split(data)
     type_classefier_model(train_data, dev, train_data, train_data)
 
-def type_classefier_model(train: pd.DataFrame, dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
+def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
+    """
+
+    :param train: training data - preprocessed but not flattened/aggregated by group
+    :param dev: dev data - preprocessed but not flattened/aggregated by group
+    :param flatten: training data preprocessed and flattened by group
+    :param fifth: training lables of
+    :return:
+    """
     train_labels = fifth.linqmap_type
 
     def catboost_classifier():
         baseline_family_tree = CatBoostClassifier(iterations=100)
         baseline_family_tree.fit(flatten, train_labels, cat_features=['linqmap_type','linqmap_subtype','day_of_week'])
-        family_prediction = baseline_family_tree.predict(dev)
+        family_prediction = baseline_family_tree.predict(flatten_dev)
         return family_prediction
 
     def match_common_subtype(pred):
