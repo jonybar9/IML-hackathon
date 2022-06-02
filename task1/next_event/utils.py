@@ -16,7 +16,6 @@ def data_split(data: pd.DataFrame):
     -------
         train, dev, test - DataFrame, DataFrame, DataFrame
     """
-    np.random.seed(0)
     test = data.sample(frac=TEST_SIZE)
     train_dev = data.drop(index=test.index)
     train = train_dev.sample(frac=TRAIN_SIZE)

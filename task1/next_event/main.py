@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from task1.next_event.utils import load_data, data_split
 from task1.next_event.pre_process import preprocess
-from sklearn.tree import DecisionTreeClassifier
 from pre_process import bulk_bootsraping, group_by_bulk, split_train_data_to_X_and_y, merge_test_data
 from catboost import CatBoostClassifier
 
@@ -21,24 +20,30 @@ def main():
     grouped_dev = group_by_bulk(dev_with_groups)
     X_dev, y_dev = split_train_data_to_X_and_y(grouped_dev)
 
+    type_classefier_model(train_data, dev, X_train, y_train)
 
+def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
+    """
 
-    type_classefier_model(train_data, dev, test, train_data, train_data)
-
-def type_classefier_model(train: pd.DataFrame, dev: pd.DataFrame, test: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
+    :param train: training data - preprocessed but not flattened/aggregated by group
+    :param dev: dev data - preprocessed but not flattened/aggregated by group
+    :param flatten: training data preprocessed and flattened by group
+    :param fifth: training lables of
+    :return:
+    """
     train_labels = fifth.linqmap_type
 
     def catboost_classifier():
         baseline_family_tree = CatBoostClassifier(iterations=100)
         baseline_family_tree.fit(flatten, train_labels, cat_features=['linqmap_type','linqmap_subtype','day_of_week'])
-        family_prediction = baseline_family_tree.predict(dev)
+        family_prediction = baseline_family_tree.predict(flatten_dev)
         return family_prediction
 
-    def match_common_subtype(prediction):
+    def match_common_subtype(pred):
         most_common_sub_types = train.groupby(['linqmap_type'])['linqmap_subtype'].agg(pd.Series.mode).to_frame()
         most_common_sub_types = most_common_sub_types.to_dict(orient='index')
         func = (lambda item: most_common_sub_types[item]['linqmap_subtype'])
-        sub_type_prediction = np.array(list(map(func, prediction)))
+        sub_type_prediction = np.array(list(map(func, pred)))
         return sub_type_prediction
 
     prediction = catboost_classifier()
