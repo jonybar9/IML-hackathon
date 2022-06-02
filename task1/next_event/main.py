@@ -1,16 +1,16 @@
 import pandas as pd
-from .utils import load_data
+from .utils import load_data, data_split
+from .pre_process import preprocess
 from sklearn.tree import DecisionTreeClassifier
 
 
 def main():
     # args = get_arguments()
-    data = load_data() 
-    train_data, dev, test = split_data(data)
-    test = load_data('waze_take_features.csv')
-    # add preprocessing
+    data = load_data()
+    data = preprocess(data)
+    train_data, dev, test = data_split(data)
 
-    event_family, event_subtype = split_data(train_data)
+    event_family, event_subtype = split_data_for_event_classifiers(train_data)
 
     # PART ONE: Classification of Event Type: Using decision tree
     baseline_family_tree = DecisionTreeClassifier(max_depth=5)
@@ -23,7 +23,7 @@ def main():
     #sub_type_prediction: for each value in family_prediction match the most common val from groupby
 
 
-def split_data(data: pd.Dataframe):
+def split_data_for_event_classifiers(data: pd.Dataframe):
     """
     splits the data for the event types classifiers
     :param data: pandas.DataFrame
