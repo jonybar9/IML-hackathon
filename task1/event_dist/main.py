@@ -1,23 +1,94 @@
 from task1.common import load_data
-from task1.event_dist.pre_process import preprocess
+from task1.event_dist.utils import data_split
+from task1.event_dist.pre_process import preprocess, time_section, convert_weekday
 # from .utils import get_arguments
+import numpy as np
+from collections import defaultdict
+import os as os
+
+
+dates = ["05.06.2022","07.06.2022", "09.06.2022"]
+
+
+def date_cannonical():
+    pass
 
 
 def main():
     # args = get_arguments()
     data = load_data()
-    fit(data)
+    train, dev, test = data_split(data)
+    events_by_day = fit(train)
+    predict(dates, events_by_day)
+
+
 
 def fit(data):
     df = preprocess(data)
-    print(df.head(200))
+    sectioned = time_section(df)
+    events_by_day = fit_the_day(sectioned)
+    return events_by_day
+
     # model = fit(df)
     # save_model(model)
 
-def predict(data):
-    df = preprocess(data)
+def predict( dates, events_by_day):
+    import pandas as pd
+    dates_dates = pd.to_datetime(dates, dayfirst=True)
+
+    print("this is it")
+    print(dates_dates)
+    weekday =dates_dates.day_of_week
+
+    list_days =weekday.values.tolist()
+    for day in list_days:
+        print(list_days)
+        print(day)
+
+        idx = day - 1
+        prediction = events_by_day[idx]
+        prediction = pd.DataFrame(prediction)
+        prediction.to_csv('yyyy-mm-dd.csv')
     # model = load_model()
     # pred = predict(model, df)
+
+
+
+def fit_the_day(data):
+    data = convert_weekday(data)
+    day_data_dist = []
+
+    for day in range(1,8):
+        new_data = data[data["pub_day"] == day]
+        arr_events = dummy_average_by_section(new_data)
+        day_data_dist.append(arr_events)
+        print(arr_events)
+    return day_data_dist
+
+
+def dummy_average_by_section(data):
+    arr_events = []
+    for time_sec in range(1, 4):
+
+        cur = data[data["section"] == time_sec]
+        observations = cur.shape[0]
+
+        dict_i = cur["linqmap_type"].value_counts().to_dict()
+
+        accident = dict_i.get('ACCIDENT', 0)
+        jam =  dict_i.get('JAM', 0)
+        road_cloased = dict_i.get('ROAD_CLOSED', 0)
+        weather = dict_i.get('WEATHERHAZARD', 0)
+
+        events_in_sec = [accident, jam, road_cloased, weather]
+        events_in_sec = np.asarray(events_in_sec)
+
+        events_in_sec = events_in_sec / observations
+        events_in_sec = np.nan_to_num(events_in_sec, nan=0.000)
+        arr_events.append(events_in_sec.tolist())
+    return arr_events
+
+
 
 
 
