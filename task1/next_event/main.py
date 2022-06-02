@@ -5,8 +5,9 @@ from sklearn.tree import DecisionTreeClassifier
 
 def main():
     # args = get_arguments()
-    train_data = load_data()
-    test_data = load_data('waze_take_features.csv')
+    data = load_data() 
+    train_data, dev, test = split_data(data)
+    test = load_data('waze_take_features.csv')
     # add preprocessing
 
     event_family, event_subtype = split_data(train_data)
@@ -14,7 +15,7 @@ def main():
     # PART ONE: Classification of Event Type: Using decision tree
     baseline_family_tree = DecisionTreeClassifier(max_depth=5)
     baseline_family_tree.fit(event_family[0], event_family[1])
-    family_prediction = baseline_family_tree.predict(test_data)
+    family_prediction = baseline_family_tree.predict(test)
 
     # PART TWO: Classification of Event Sub Type: Using Mean
     # for all events from this family, return the most common subtype
