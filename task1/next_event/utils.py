@@ -23,6 +23,7 @@ def data_split(data: pd.DataFrame):
     dev = train_dev.drop(index=train.index)
     return train, dev, test
 
+
 def load_data(filename='waze_data.csv'):
     """
     preforms data preprocessing and splits data to train, test, dev
