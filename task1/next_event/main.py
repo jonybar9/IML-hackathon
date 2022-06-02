@@ -34,12 +34,16 @@ def split_data(data: pd.Dataframe):
 
 def fit(data):
     df = preprocess(data)
-    model = fit(df)
-    save_model(model)
+    print(df.head(100))
+    # model = fit(df)
+    # save_model(model)
 
 
 def predict(data):
     df = preprocess(data)
-    model = load_model()
-    pred = predict(model, df)
+    # model = load_model()
+    # pred = predict(model, df)
 
+
+if __name__ == "__main__":
+    main()
