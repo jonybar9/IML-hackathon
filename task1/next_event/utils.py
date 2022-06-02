@@ -36,4 +36,4 @@ def load_data(filename='waze_data.csv'):
         processed samples - DataFrame
     """
     df = pd.read_csv(filename)
-    return data_split(df)
+    return df
