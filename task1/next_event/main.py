@@ -10,7 +10,7 @@ def main():
     data = load_data(r"..\datasets\waze_data.csv")
     data = preprocess(data)
     train_data, dev, test = data_split(data)
-    type_classefier_model(train_data, test, train_data, train_data)
+    type_classefier_model(train_data, dev, train_data, train_data)
 
 def type_classefier_model(train: pd.DataFrame, dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
     train_labels = fifth.linqmap_type
