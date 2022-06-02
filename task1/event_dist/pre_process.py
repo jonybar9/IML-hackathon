@@ -1,8 +1,8 @@
-from ..common import UNUSED_COLUMNS, parse_time ,parse_time_publish
+from ..common import UNUSED_COLUMNS, parse_time_updated ,parse_time_publish
 import  numpy as np
 
 def preprocess(data):
-    parse_time(data)
+    parse_time_updated(data)
     parse_time_publish(data)
     columns_to_drop_Q2 = ['linqmap_subtype', 'linqmap_magvar', 'x', 'y']
     data = data.drop(columns=columns_to_drop_Q2)

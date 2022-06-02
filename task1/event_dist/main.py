@@ -1,4 +1,5 @@
-from task1.common import load_data, data_split
+from task1.common import load_data
+from task1.event_dist.utils import data_split
 from task1.event_dist.pre_process import preprocess, time_section, convert_weekday
 # from .utils import get_arguments
 import numpy as np
@@ -10,7 +11,7 @@ dates = ["05.06.2022","07.06.2022", "09.06.2022"]
 
 
 def date_cannonical():
-
+    pass
 
 
 def main():
