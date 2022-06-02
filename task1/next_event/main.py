@@ -3,7 +3,7 @@ import numpy as np
 from task1.next_event.utils import load_data, data_split
 from task1.next_event.pre_process import preprocess
 from pre_process import bulk_bootsraping, group_by_bulk, split_train_data_to_X_and_y, merge_test_data
-from catboost import CatBoostClassifier
+from catboost import CatBoostClassifier, CatBoostRegressor
 
 
 def main():
@@ -21,6 +21,19 @@ def main():
     X_dev, y_dev = split_train_data_to_X_and_y(grouped_dev)
 
     type_classefier_model(train_data, dev, X_train, y_train)
+
+
+def regressor_x_y(X_train, y_train, X_dev, y_dev):
+
+    model_x = CatBoostRegressor(iterations=100)
+    model_y = CatBoostRegressor(iterations=100)
+
+    model_x.fit(X_train, y_train[2], cat_features=['linqmap_type','linqmap_subtype','day_of_week'])
+    model_y.fit(X_train, y_train[3], cat_features=['linqmap_type','linqmap_subtype','day_of_week'])
+
+    return model_x.predict(X_dev), model_y.predict(X_dev)
+
+
 
 
 def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
