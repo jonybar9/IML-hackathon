@@ -12,8 +12,6 @@ def preprocess(data):
     data = data.drop(columns=UNUSED_COLUMNS) # THIS NEEDS TO CHANGE
     data.dropna(inplace=True)
 
-    data = pd.concat([data, pd.get_dummies(data['hour'], drop_first=True)], axis=1)
-    data = data.drop(columns=["linqmap_type", "linqmap_subtype", "day_of_week", 'hour'])
 
     return data
 
@@ -45,13 +43,6 @@ def _add_bulk_number(df, i):
 
     return df
 
-
-def make_dummies(data):
-    data = pd.concat([data, pd.get_dummies(data['linqmap_type'], drop_first=True)], axis=1)
-    data = pd.concat([data, pd.get_dummies(data['linqmap_subtype'], drop_first=True)], axis=1)
-    data = data.drop(columns=["linqmap_type", "linqmap_subtype"])
-    return data
-
 def split_train_data_to_X_and_y(lst):
     """
     lst: list of dataframes with five rows
@@ -62,7 +53,7 @@ def split_train_data_to_X_and_y(lst):
     y = pd.concat(y)
     y = y[['linqmap_type', 'linqmap_subtype', 'x', 'y']]  # keep only labels we need to predict
 
-    X = np.array([make_dummies(df)[:4].to_numpy().flatten() for df in lst])
+    X = np.array([df[:4].to_numpy().flatten() for df in lst])
     return X, y
 
 
@@ -76,8 +67,6 @@ def merge_test_data(lst):
     return X
 
 # def group_by_time(data):
-
-
 # def clean_data():
     
 
