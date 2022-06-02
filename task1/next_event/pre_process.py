@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 GROUP_COL_NAME = 'test_set'
+BULK_SIZE = 4
 
 def preprocess(data):
     parse_time(data)
@@ -24,8 +25,8 @@ def group_by_bulk():
 def bulk_bootsraping(data):
     col_names = list(data.columns)
     col_names.append(GROUP_COL_NAME)
-    bulks_list = [data.iloc[i:i + 5, ].copy() for i in
-                  range(data.shape[0] - 5)]
+    bulks_list = [data.iloc[i:i + BULK_SIZE + 1, ].copy() for i in
+                  range(data.shape[0] - (BULK_SIZE + 1))]
     numbered_bulks = map(lambda item: _add_bulk_number(item[1], item[0]),
                          enumerate(bulks_list))
     bulks = np.array(list(numbered_bulks))
