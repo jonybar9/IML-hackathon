@@ -9,12 +9,15 @@ from catboost import CatBoostClassifier, CatBoostRegressor, Pool
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 
-def main():
+def main(train_path="waze_data.csv", test_path="waze_take_features.csv", dates=''):
     # args = get_arguments()
-    data = load_data(r"..\datasets\waze_data.csv")
+    data = load_data(train_path)
     data = preprocess(data)
     train_data, dev, test = data_split(data)
-    real_test = load_data(r"..\datasets\waze_take_features.csv")
+    real_test = load_data(test_path)
+    real_test = preprocess(real_test)
+
+    #X_test = merge_test_data(bulk_bootsraping(real_test))
 
     train_with_groups = bulk_bootsraping(train_data)
     grouped_train = group_by_bulk(train_with_groups)
@@ -30,6 +33,8 @@ def main():
                           ]
 
     types_pred, subtypes_pred = type_classefier_model(train_data, X_dev,y_dev, X_train, y_train, categorial_indices)
+    #types_pred, subtypes_pred = type_classefier_model(train_data, X_test,y_dev, X_train, y_train, categorial_indices)
+
     #predictions = regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices)
     result = np.concatenate((types_pred, subtypes_pred),axis=1)
     result = pd.DataFrame(result)
@@ -101,8 +106,3 @@ def predict(data):
     df = preprocess(data)
     # model = load_model()
     # pred = predict(model, df)
-
-
-if __name__ == "__main__":
-    np.random.seed(0)
-    main()
