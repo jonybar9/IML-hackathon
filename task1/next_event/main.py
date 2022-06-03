@@ -1,8 +1,11 @@
 import pandas as pd
 import numpy as np
 from task1.next_event.utils import load_data, data_split
+from task1.next_event.pre_process import preprocess, bulk_bootsraping, \
+    group_by_bulk, split_train_data_to_X_and_y, merge_test_data
 from task1.next_event.pre_process import preprocess
 from pre_process import bulk_bootsraping, group_by_bulk, split_train_data_to_X_and_y, merge_test_data
+from catboost import CatBoostClassifier, CatBoostRegressor, Pool
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 
@@ -14,26 +17,28 @@ def main():
 
     train_with_groups = bulk_bootsraping(train_data)
     grouped_train = group_by_bulk(train_with_groups)
-    X_train, y_train = split_train_data_to_X_and_y(grouped_train)
+    X_train, y_train, categorial_indices = split_train_data_to_X_and_y(grouped_train)
 
     dev_with_groups = bulk_bootsraping(dev)
     grouped_dev = group_by_bulk(dev_with_groups)
-    X_dev, y_dev = split_train_data_to_X_and_y(grouped_dev)
+    X_dev, y_dev, categorial_indices  = split_train_data_to_X_and_y(grouped_dev)
+    categorial_indices = ['day_of_week_0', 'day_of_week_1', 'day_of_week_2', 'day_of_week_3',
+                          'linqmap_type_0', 'linqmap_type_1', 'linqmap_type_2', 'linqmap_type_3',
+                          'linqmap_subtype_0', 'linqmap_subtype_1', 'linqmap_subtype_2', 'linqmap_subtype_3',
+                          ]
 
-    type_classefier_model(train_data, dev, X_train, y_train)
+    type_classefier_model(train_data, X_dev,y_dev, X_train, y_train)
+    predictions = regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices)
 
-
-def regressor_x_y(X_train, y_train, X_dev, y_dev):
+def regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices):
 
     model_x = CatBoostRegressor(iterations=100)
     model_y = CatBoostRegressor(iterations=100)
+    # categorial_indices = pd.DataFrame(X_train).select_dtypes("O").columns
+    model_x.fit(pd.DataFrame(X_train), y_train[2], cat_features=categorial_indices)
+    model_y.fit(pd.DataFrame(X_train), y_train[3], cat_features=categorial_indices)
 
-    model_x.fit(X_train, y_train[2], cat_features=['linqmap_type','linqmap_subtype','day_of_week'])
-    model_y.fit(X_train, y_train[3], cat_features=['linqmap_type','linqmap_subtype','day_of_week'])
-
-    return model_x.predict(X_dev), model_y.predict(X_dev)
-
-
+    return model_x.predict(pd.DataFrame(X_dev)), model_y.predict(pd.DataFrame(X_dev))
 
 
 def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
@@ -47,10 +52,9 @@ def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_
     :return: Tuple[event family prediction, event subtype prediction]
     """
     train_labels = fifth.linqmap_type
-
     def catboost_classifier():
         baseline_family_tree = CatBoostClassifier(iterations=100)
-        baseline_family_tree.fit(flatten, train_labels, cat_features=['linqmap_type','linqmap_subtype','day_of_week'])
+        baseline_family_tree.fit(flatten, train_labels, cat_features=categorial_indices)
         family_prediction = baseline_family_tree.predict(flatten_dev)
         return family_prediction
 
@@ -60,6 +64,20 @@ def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_
         func = (lambda item: most_common_sub_types[item]['linqmap_subtype'])
         sub_type_prediction = np.array(list(map(func, pred)))
         return sub_type_prediction
+
+    def subtype_classifiers(predicted_types):
+        # fit:
+        families = {}
+        for family in np.unique(train_labels):
+            family_data = train[train.linqmap_type == family]
+            family_labels = family_data.drop('linqmap_subtype')
+            model = CatBoostClassifier(iterations=100)
+            model.fit(flatten, train_labels, cat_features=['linqmap_type', 'day_of_week'])
+            families[family] = model
+
+        # prediction - this will not work
+        func = (lambda item: families[item].predict(dev))
+        sub_type_prediction = np.array(list(map(func, predicted_types)))
 
     prediction = catboost_classifier()
     return prediction , match_common_subtype(prediction)
