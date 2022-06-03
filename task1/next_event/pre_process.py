@@ -43,6 +43,10 @@ def _add_bulk_number(df, i):
 
     return df
 
+# def add_dummies(df):
+#
+#     df = pd.concat([df, pd.get_dummies()])
+
 def split_train_data_to_X_and_y(lst):
     """
     lst: list of dataframes with five rows
@@ -60,8 +64,16 @@ def split_train_data_to_X_and_y(lst):
         categorial_indices.append(categorial_indices[-1]+d)
 
     y = y[['linqmap_type', 'linqmap_subtype', 'x', 'y']]  # keep only labels we need to predict
+    col_names_base = list(lst[0].columns)
+    col_names = [f"{name}_{i}" for i in range(4) for name in col_names_base]
 
     X = np.array([df[:4].to_numpy().flatten() for df in lst])
+    X = pd.DataFrame(X)
+    X.columns = col_names
+    a=3
+
+
+
 
 
     return X, y, sorted(categorial_indices)
