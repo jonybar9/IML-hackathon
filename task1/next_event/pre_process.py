@@ -19,7 +19,7 @@ preprocess(pd.read_csv(r"..\datasets\waze_data.csv"))
 
 def group_by_bulk(data_with_groups):
     bulks_list = [x for _, x in data_with_groups.groupby(data_with_groups[GROUP_COL_NAME])]
-    bulks = np.array(bulks_list)
+    bulks = pd.Series(np.array(bulks_list))
     return bulks
 
 
