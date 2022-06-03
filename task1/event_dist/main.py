@@ -7,48 +7,50 @@ from collections import defaultdict
 import os as os
 
 
-dates = ["05.06.2022","07.06.2022", "09.06.2022"]
+#dates = ["05.06.2022", "07.06.2022", "09.06.2022"]
+dates = ["2022.06.05", "2022.06.07", "2022.06.09"]
 
 
-def date_cannonical():
-    pass
-
+def date_cannonical(dateslist):
+    reformated = []
+    #YYYY/MM/DD to dd.mm.yyyy
+    for item in dateslist:
+        reformated.append(item[8:] + "." + item[5:7] + "." + item[0:4])
+    return reformated
 
 def main():
     # args = get_arguments()
     data = load_data()
     train, dev, test = data_split(data)
     events_by_day = fit(train)
-    predict(dates, events_by_day)
 
-
+    # change dates to dd.mm.yyyy format
+    cannonical_dates = date_cannonical(dates)
+    print(cannonical_dates)
+    predict(cannonical_dates, events_by_day)
 
 def fit(data):
     df = preprocess(data)
     sectioned = time_section(df)
+
+    print(sectioned.groupby(["linqmap_type","pub"]).size().unstack(fill_value=0))
+
+    # get the average table
     events_by_day = fit_the_day(sectioned)
     return events_by_day
 
-    # model = fit(df)
-    # save_model(model)
-
-def predict( dates, events_by_day):
+def predict(dates, events_by_day):
     import pandas as pd
-    dates_dates = pd.to_datetime(dates, dayfirst=True)
+    dates_lst = pd.to_datetime(dates, dayfirst=True)
+    weekday = dates_lst.day_of_week
 
-    print("this is it")
-    print(dates_dates)
-    weekday =dates_dates.day_of_week
-
-    list_days =weekday.values.tolist()
-    for day in list_days:
-        print(list_days)
-        print(day)
-
-        idx = day - 1
+    list_days = weekday.values.tolist()
+    list_days = (dates_lst.dayofweek + 1)%7
+    for day in range(len(list_days)):
+        idx = list_days[day]
         prediction = events_by_day[idx]
         prediction = pd.DataFrame(prediction)
-        prediction.to_csv('yyyy-mm-dd.csv')
+        prediction.to_csv(dates[day] +'.csv')
     # model = load_model()
     # pred = predict(model, df)
 
