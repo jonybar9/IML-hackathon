@@ -10,7 +10,7 @@ def preprocess(data):
     parse_time(data)
     data = data[data['linqmap_city'] == 'תל אביב - יפו']
     data = data.drop(columns=UNUSED_COLUMNS) # THIS NEEDS TO CHANGE
-    data.dropna(inplace=True )
+    data.dropna(inplace=True)
 
 
     return data
@@ -18,8 +18,8 @@ def preprocess(data):
 
 def group_by_bulk(data_with_groups):
     bulks_list = [x for _, x in data_with_groups.groupby(data_with_groups[GROUP_COL_NAME])]
-
-    return bulks_list
+    bulks = np.array(bulks_list).shape
+    return bulks
 
 
 def bulk_bootsraping(data):
