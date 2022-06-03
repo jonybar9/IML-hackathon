@@ -14,6 +14,7 @@ def main():
     data = load_data(r"..\datasets\waze_data.csv")
     data = preprocess(data)
     train_data, dev, test = data_split(data)
+    real_test = load_data(r"..\datasets\waze_take_features.csv")
 
     train_with_groups = bulk_bootsraping(train_data)
     grouped_train = group_by_bulk(train_with_groups)
@@ -22,6 +23,7 @@ def main():
     dev_with_groups = bulk_bootsraping(dev)
     grouped_dev = group_by_bulk(dev_with_groups)
     X_dev, y_dev, categorial_indices  = split_train_data_to_X_and_y(grouped_dev)
+
     categorial_indices = ['day_of_week_0', 'day_of_week_1', 'day_of_week_2', 'day_of_week_3',
                           'linqmap_type_0', 'linqmap_type_1', 'linqmap_type_2', 'linqmap_type_3',
                           'linqmap_subtype_0', 'linqmap_subtype_1', 'linqmap_subtype_2', 'linqmap_subtype_3',
@@ -29,9 +31,11 @@ def main():
 
     types_pred, subtypes_pred = type_classefier_model(train_data, X_dev,y_dev, X_train, y_train, categorial_indices)
     #predictions = regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices)
-    x_coor_mean = train_data.x.mean()
-    y_coor_mean = train_data.y.mean()
-    result = np.concatenate()
+    result = np.concatenate((types_pred, subtypes_pred),axis=1)
+    result = pd.DataFrame(result)
+    result['x'] = train_data.x.mean()
+    result['y'] = train_data.y.mean()
+    result.to_csv('predictions.csv', header=False, index=False)
 
 def regressor_x_y(X_train, y_train, X_dev, y_dev, cat_indices):
     model_x = CatBoostRegressor(iterations=100)
