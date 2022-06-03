@@ -11,44 +11,57 @@ import os as os
 dates = ["2022.06.05", "2022.06.07", "2022.06.09"]
 
 
+
 def date_cannonical(dateslist):
+    import copy
     reformated = []
     #YYYY/MM/DD to dd.mm.yyyy
-    for item in dateslist:
+    new_dateslist = copy.deepcopy(dateslist)
+    for item in new_dateslist:
         reformated.append(item[8:] + "." + item[5:7] + "." + item[0:4])
     return reformated
 
 def main():
     # args = get_arguments()
     data = load_data()
+    n_rows = data.shape[0]
     train, dev, test = data_split(data)
-    events_by_day = fit(train)
+    events_by_day, sections_scalars = fit(train, n_rows)
 
     # change dates to dd.mm.yyyy format
     cannonical_dates = date_cannonical(dates)
-    print(cannonical_dates)
-    predict(cannonical_dates, events_by_day)
+    predict(dates, events_by_day, sections_scalars)
 
-def fit(data):
+def fit(data , nrows):
     df = preprocess(data)
+    print(data)
     sectioned = time_section(df)
 
-    print(sectioned.groupby(["linqmap_type","pub"]).size().unstack(fill_value=0))
-
+    sectioned = convert_weekday(sectioned)
+    percent_hazard = sectioned["linqmap_type"].value_counts()
+    percents_sections = sectioned["section"].value_counts()/sectioned.shape[0]
+    sections_scalars = (percents_sections * nrows)/5
     # get the average table
     events_by_day = fit_the_day(sectioned)
-    return events_by_day
+    return events_by_day , sections_scalars
 
-def predict(dates, events_by_day):
+def predict(dates, events_by_day, sections_scalars):
     import pandas as pd
     dates_lst = pd.to_datetime(dates, dayfirst=True)
     weekday = dates_lst.day_of_week
 
     list_days = weekday.values.tolist()
-    list_days = (dates_lst.dayofweek + 1)%7
+    list_days = (dates_lst.dayofweek + 1) % 7
+
+    event_avg = events_by_day
+
     for day in range(len(list_days)):
         idx = list_days[day]
-        prediction = events_by_day[idx]
+        prediction =  events_by_day[idx]
+        prediction[0] *= sections_scalars[1]
+        prediction[1] *= sections_scalars[2]
+        prediction[2] *= sections_scalars[3]
+
         prediction = pd.DataFrame(prediction)
         prediction.to_csv(dates[day] +'.csv')
     # model = load_model()

@@ -3,6 +3,7 @@ import  numpy as np
 def preprocess(data):
     parse_time_updated(data)
     parse_time_publish(data)
+    return data
 
 def time_section(data):
     data["section"] = np.zeros(data.shape[0])
