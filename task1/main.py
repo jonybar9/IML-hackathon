@@ -1,7 +1,9 @@
 import sys
-from task1.next_event.main import predict as predict_next
-from task1.event_dist.main import predict as dist_predict
-from task1.next_event import task_1, task_2
+import numpy as np
+from task1.next_event.task_1 import predict as predict_next
+from task1.event_dist.task_2 import predict as dist_predict
+from task1.next_event import task_1
+from task1.event_dist import task_2
 
 def main():
     args = sys.argv
@@ -10,14 +12,10 @@ def main():
     task2_dates_path = args[3]
     dist_predict(test_path)
     try:
-        task_1.main(train_path, test_path)
-    except:
-        pass
+        task_1.main1(train_path, test_path)
 
     try:
-        task_2.main(task2_dates_path)
-    except:
-        pass
+        task_2.main2(task2_dates_path)
 
 if __name__ == "__main__":
     np.random.seed(0)

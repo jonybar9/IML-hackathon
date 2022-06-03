@@ -22,7 +22,7 @@ def date_cannonical(dateslist):
 
     return reformated
 
-def main():
+def main2(d=''):
     # args = get_arguments()
     data = load_data()
     n_rows = data.shape[0]
@@ -110,9 +110,4 @@ def dummy_average_by_section(data):
         arr_events.append(events_in_sec.tolist())
     return arr_events
 
-
-
-
-
-if __name__ == "__main__":
-    main()
+main2()

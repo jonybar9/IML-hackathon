@@ -3,13 +3,14 @@ import numpy as np
 from task1.next_event.utils import load_data, data_split
 from task1.next_event.pre_process import preprocess, bulk_bootsraping, \
     group_by_bulk, split_train_data_to_X_and_y, merge_test_data
-from task1.next_event.pre_process import preprocess
-from pre_process import bulk_bootsraping, group_by_bulk, split_train_data_to_X_and_y, merge_test_data
+#from task1.next_event.pre_process import preprocess
+from .pre_process import preprocess
+from .pre_process import bulk_bootsraping, group_by_bulk, split_train_data_to_X_and_y, merge_test_data
 from catboost import CatBoostClassifier, CatBoostRegressor, Pool
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 
-def main(train_path="waze_data.csv", test_path="waze_take_features.csv", dates=''):
+def main1(train_path="waze_data.csv", test_path="waze_take_features.csv", dates=''):
     # args = get_arguments()
     data = load_data(train_path)
     data = preprocess(data)
@@ -106,3 +107,5 @@ def predict(data):
     df = preprocess(data)
     # model = load_model()
     # pred = predict(model, df)
+
+main1()
