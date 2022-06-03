@@ -57,7 +57,7 @@ def predict(dates, events_by_day, sections_scalars):
 
     for day in range(len(list_days)):
         idx = list_days[day]
-        prediction = 0.75 * events_by_day[idx]
+        prediction =  events_by_day[idx]
         prediction[0] *= sections_scalars[1]
         prediction[1] *= sections_scalars[2]
         prediction[2] *= sections_scalars[3]
