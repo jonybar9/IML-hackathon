@@ -8,7 +8,7 @@ import os as os
 
 
 #dates = ["05.06.2022", "07.06.2022", "09.06.2022"]
-dates = ["2022.06.05", "2022.06.07", "2022.06.09"]
+dates = ["2022/06/05", "2022/06/07", "2022/06/09"]
 
 
 
@@ -19,6 +19,7 @@ def date_cannonical(dateslist):
     new_dateslist = copy.deepcopy(dateslist)
     for item in new_dateslist:
         reformated.append(item[8:] + "." + item[5:7] + "." + item[0:4])
+
     return reformated
 
 def main():
@@ -38,11 +39,12 @@ def fit(data , nrows):
     sectioned = time_section(df)
 
     sectioned = convert_weekday(sectioned)
-    percent_hazard = sectioned["linqmap_type"].value_counts()
-    percents_sections = sectioned["section"].value_counts()/sectioned.shape[0]
+    print(sectioned["section"].value_counts().sort_index())
+    percents_sections = sectioned["section"].value_counts().sort_index()/sectioned.shape[0]
     sections_scalars = (percents_sections * nrows)/5
     # get the average table
     events_by_day = fit_the_day(sectioned)
+
     return events_by_day , sections_scalars
 
 def predict(dates, events_by_day, sections_scalars):
@@ -51,19 +53,25 @@ def predict(dates, events_by_day, sections_scalars):
     weekday = dates_lst.day_of_week
 
     list_days = weekday.values.tolist()
+
+    dates_for = pd.to_datetime(dates)
     list_days = (dates_lst.dayofweek + 1) % 7
+    sections_scalars = sections_scalars.astype(int)
 
-    event_avg = events_by_day
-
+    print(sections_scalars.dtype)
+    print(sections_scalars[1].dtype)
     for day in range(len(list_days)):
         idx = list_days[day]
-        prediction =  events_by_day[idx]
-        prediction[0] *= sections_scalars[1]
-        prediction[1] *= sections_scalars[2]
-        prediction[2] *= sections_scalars[3]
-
+        prediction = events_by_day[idx]
+        print(np.round(prediction[0],2) * sections_scalars[1])
+        prediction = [np.round(prediction[0],2) * sections_scalars[1],
+                      np.round(prediction[1],2) * sections_scalars[2],
+                      np.round(prediction[2],2)* sections_scalars[3]]
+        #print(prediction)
         prediction = pd.DataFrame(prediction)
-        prediction.to_csv(dates[day] +'.csv')
+
+
+        prediction.to_csv(str(dates_for[day])[0:10] +'.csv')
     # model = load_model()
     # pred = predict(model, df)
 
@@ -79,7 +87,6 @@ def fit_the_day(data):
         day_data_dist.append(arr_events)
         print(arr_events)
     return day_data_dist
-
 
 def dummy_average_by_section(data):
     arr_events = []
