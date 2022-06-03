@@ -9,12 +9,13 @@ BULK_SIZE = 4
 def preprocess(data):
     parse_time(data)
     data = data[data['linqmap_city'] == 'תל אביב - יפו']
-    data = data.drop(columns=UNUSED_COLUMNS) # THIS NEEDS TO CHANGE
-    # data.dropna(inplace=True)
-
+    data = data.drop(columns=UNUSED_COLUMNS)
+    data.interpolate(inplace=True)
+    #data.dropna(inplace=True)
 
     return data
 
+preprocess(pd.read_csv(r"..\datasets\waze_data.csv"))
 
 def group_by_bulk(data_with_groups):
     bulks_list = [x for _, x in data_with_groups.groupby(data_with_groups[GROUP_COL_NAME])]
@@ -71,11 +72,6 @@ def split_train_data_to_X_and_y(lst):
     X = pd.DataFrame(X)
     X.columns = col_names
     a=3
-
-
-
-
-
     return X, y, sorted(categorial_indices)
 
 
@@ -87,3 +83,4 @@ def merge_test_data(lst):
     """
     X = np.array([df[:4].to_numpy().flatten() for df in lst])
     return X
+
