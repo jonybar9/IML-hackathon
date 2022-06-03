@@ -1,6 +1,21 @@
 import pandas as pd
 import pickle
 
+# duplicated code because of different column names and the hour being too late.
+def parse_time_publish(data):
+    # convert date to datetime format and add time features
+    data['pubDate'] = pd.to_datetime(data['pubDate'])
+    data['pub_day'] = data['pubDate'].dt.day_name()
+    data['pub_hour'] = data['pubDate'].dt.hour
+
+
+def parse_time_updated(data):
+    # convert date to datetime format and add time features
+    data['update_date'] = pd.to_datetime(data['update_date'], unit='ms')
+    data['day_of_week'] = data['update_date'].dt.day_name()
+    data['hour'] = data['update_date'].dt.hour
+
+
 def parse_time(data):
     # convert date to datetime format and add time features
     data['pubDate'] = pd.to_datetime(data['pubDate'])
