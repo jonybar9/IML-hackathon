@@ -10,7 +10,7 @@ from catboost import CatBoostClassifier, CatBoostRegressor, Pool
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 
-def main1(train_path="waze_data.csv", test_path="waze_take_features.csv", dates=''):
+def main1(train_path="waze_data.csv", test_path="waze_take_features.csv"):
     # args = get_arguments()
     data = load_data(train_path)
     data = preprocess(data)

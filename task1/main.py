@@ -10,12 +10,16 @@ def main():
     train_path = args[1]
     test_path = args[2]
     task2_dates_path = args[3]
-    dist_predict(test_path)
+    #dist_predict(test_path)
     try:
         task_1.main1(train_path, test_path)
+    except Exception:
+        pass
 
     try:
         task_2.main2(task2_dates_path)
+    except Exception:
+        pass
 
 if __name__ == "__main__":
     np.random.seed(0)
