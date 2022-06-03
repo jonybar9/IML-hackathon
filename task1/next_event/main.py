@@ -75,7 +75,6 @@ def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_
         func = (lambda item: families[item].predict(dev))
         sub_type_prediction = np.array(list(map(func, predicted_types)))
 
-
     prediction = catboost_classifier()
     return prediction , match_common_subtype(prediction)
 
