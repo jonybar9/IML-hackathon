@@ -10,12 +10,10 @@ def preprocess(data):
     parse_time(data)
     data = data[data['linqmap_city'] == 'תל אביב - יפו']
     data = data.drop(columns=UNUSED_COLUMNS)
-    data.interpolate(inplace=True)
-    #data.dropna(inplace=True)
-
+    #data.interpolate(method='linear', inplace=True)
+    data.fillna('',inplace=True)
     return data
 
-preprocess(pd.read_csv(r"..\datasets\waze_data.csv"))
 
 def group_by_bulk(data_with_groups):
     bulks_list = [x for _, x in data_with_groups.groupby(data_with_groups[GROUP_COL_NAME])]
