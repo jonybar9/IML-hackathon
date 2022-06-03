@@ -9,11 +9,15 @@ from catboost import CatBoostClassifier, CatBoostRegressor, Pool
 from catboost import CatBoostClassifier, CatBoostRegressor
 
 
-def main():
+def main(train_path="waze_data.csv", test_path="waze_take_features.csv", dates=''):
     # args = get_arguments()
-    data = load_data(r"..\datasets\waze_data.csv")
+    data = load_data(train_path)
     data = preprocess(data)
     train_data, dev, test = data_split(data)
+    real_test = load_data(test_path)
+    real_test = preprocess(real_test)
+
+    #X_test = merge_test_data(bulk_bootsraping(real_test))
 
     train_with_groups = bulk_bootsraping(train_data)
     grouped_train = group_by_bulk(train_with_groups)
@@ -22,26 +26,34 @@ def main():
     dev_with_groups = bulk_bootsraping(dev)
     grouped_dev = group_by_bulk(dev_with_groups)
     X_dev, y_dev, categorial_indices  = split_train_data_to_X_and_y(grouped_dev)
+
     categorial_indices = ['day_of_week_0', 'day_of_week_1', 'day_of_week_2', 'day_of_week_3',
                           'linqmap_type_0', 'linqmap_type_1', 'linqmap_type_2', 'linqmap_type_3',
                           'linqmap_subtype_0', 'linqmap_subtype_1', 'linqmap_subtype_2', 'linqmap_subtype_3',
                           ]
 
-    type_classefier_model(train_data, X_dev,y_dev, X_train, y_train)
-    predictions = regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices)
+    types_pred, subtypes_pred = type_classefier_model(train_data, X_dev,y_dev, X_train, y_train, categorial_indices)
+    #types_pred, subtypes_pred = type_classefier_model(train_data, X_test,y_dev, X_train, y_train, categorial_indices)
 
-def regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices):
+    #predictions = regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices)
+    result = np.concatenate((types_pred, subtypes_pred),axis=1)
+    result = pd.DataFrame(result)
+    result['x'] = train_data.x.mean()
+    result['y'] = train_data.y.mean()
+    result.to_csv('predictions.csv', header=False, index=False)
 
+def regressor_x_y(X_train, y_train, X_dev, y_dev, cat_indices):
     model_x = CatBoostRegressor(iterations=100)
     model_y = CatBoostRegressor(iterations=100)
-    # categorial_indices = pd.DataFrame(X_train).select_dtypes("O").columns
-    model_x.fit(pd.DataFrame(X_train), y_train[2], cat_features=categorial_indices)
-    model_y.fit(pd.DataFrame(X_train), y_train[3], cat_features=categorial_indices)
+    #cat_indices = pd.DataFrame(X_train).select_dtypes("O").columns
+    model_x.fit(pd.DataFrame(X_train), y_train[2], cat_features=cat_indices)
+    model_y.fit(pd.DataFrame(X_train), y_train[3], cat_features=cat_indices)
 
     return model_x.predict(pd.DataFrame(X_dev)), model_y.predict(pd.DataFrame(X_dev))
 
 
-def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame):
+def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame,
+                          fifth_dev: pd.DataFrame, flatten: pd.DataFrame, fifth: pd.DataFrame, cat_indices: list):
     """
     This function fits over flattened groups data to predict the event family and sub-type of the fifth event
     :param train: training data - preprocessed but not flattened/aggregated by group
@@ -54,16 +66,17 @@ def type_classefier_model(train: pd.DataFrame, flatten_dev: pd.DataFrame, fifth_
     train_labels = fifth.linqmap_type
     def catboost_classifier():
         baseline_family_tree = CatBoostClassifier(iterations=100)
-        baseline_family_tree.fit(flatten, train_labels, cat_features=categorial_indices)
+        baseline_family_tree.fit(flatten, train_labels, cat_features=cat_indices)
         family_prediction = baseline_family_tree.predict(flatten_dev)
         return family_prediction
 
     def match_common_subtype(pred):
-        most_common_sub_types = train.groupby(['linqmap_type'])['linqmap_subtype'].agg(pd.Series.mode).to_frame()
-        most_common_sub_types = most_common_sub_types.to_dict(orient='index')
-        func = (lambda item: most_common_sub_types[item]['linqmap_subtype'])
-        sub_type_prediction = np.array(list(map(func, pred)))
-        return sub_type_prediction
+        subtypes = pred.copy()
+        most_common_sub_types = train.groupby(['linqmap_type'])['linqmap_subtype'].agg(pd.Series.mode).to_dict()
+        most_common_sub_types['ACCIDENT'] = 'ACCIDENT_MAJOR'
+        for family in np.unique(train_labels):
+            subtypes = np.where(subtypes == family,most_common_sub_types[family] ,subtypes)
+        return subtypes
 
     def subtype_classifiers(predicted_types):
         # fit:
@@ -93,8 +106,3 @@ def predict(data):
     df = preprocess(data)
     # model = load_model()
     # pred = predict(model, df)
-
-
-if __name__ == "__main__":
-    np.random.seed(0)
-    main()
