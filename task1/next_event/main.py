@@ -22,6 +22,10 @@ def main():
     dev_with_groups = bulk_bootsraping(dev)
     grouped_dev = group_by_bulk(dev_with_groups)
     X_dev, y_dev, categorial_indices  = split_train_data_to_X_and_y(grouped_dev)
+    categorial_indices = ['day_of_week_0', 'day_of_week_1', 'day_of_week_2', 'day_of_week_3',
+                          'linqmap_type_0', 'linqmap_type_1', 'linqmap_type_2', 'linqmap_type_3',
+                          'linqmap_subtype_0', 'linqmap_subtype_1', 'linqmap_subtype_2', 'linqmap_subtype_3',
+                          ]
 
     # type_classefier_model(train_data, dev, X_train, y_train)
     predictions = regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices)
@@ -30,11 +34,11 @@ def regressor_x_y(X_train, y_train, X_dev, y_dev, categorial_indices):
 
     model_x = CatBoostRegressor(iterations=100)
     model_y = CatBoostRegressor(iterations=100)
+    # categorial_indices = pd.DataFrame(X_train).select_dtypes("O").columns
+    model_x.fit(pd.DataFrame(X_train), y_train[2], cat_features=categorial_indices)
+    model_y.fit(pd.DataFrame(X_train), y_train[3], cat_features=categorial_indices)
 
-    model_x.fit(X_train, y_train[2], cat_features=categorial_indices)
-    model_y.fit(X_train, y_train[3], cat_features=categorial_indices)
-
-    return model_x.predict(X_dev), model_y.predict(X_dev)
+    return model_x.predict(pd.DataFrame(X_dev)), model_y.predict(pd.DataFrame(X_dev))
 
 
 
